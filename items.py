@@ -7,7 +7,7 @@ def validPrice(price):
 	except ValueError:
 		print 'Price is not a number'
 		return False
-	if float(price) <= 0:
+	if float(price) < 0:
 		print 'Negative price not allowed'
 		return False
 	return True
@@ -36,14 +36,6 @@ def remove_item():
 		else:
 			print "Item not found"
 			return
-		# ctr = 0
-		# for item in items:
-		# 	if (item[0] == rm.lowercase):
-		# 		break;
-		# 	ctr = ctr + 1
-		# if ctr >= len(items):
-		# 	print "Item not found"
-		# 	return
 	else:
 		print "Email not found"
 
@@ -72,4 +64,8 @@ def add_item():
 		json.dump(data, savefile, indent=4, separators=(',', ':'))
 	print "Item added!"
 
-
+def main():
+	add_item();
+	add_item();
+if __name__ == "__main__":
+	main()

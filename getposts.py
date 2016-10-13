@@ -2,13 +2,14 @@
 import re
 import requests
 import datetime
-import decimal
+from decimal import *
 from time import time
 from calendar import timegm
 
 #Access token will not work forever
-ACCESS_TOKEN = '' #Get from Facebook- needs to be V2.3 with access to groups
-FREQUENCY = 1 #In hours
+ACCESS_TOKEN = '' 
+
+FREQUENCY = 2 #In hours
 
 def get_groups(): #Finds the FB groups a user is in  
 	token = ACCESS_TOKEN
@@ -40,7 +41,7 @@ def get_posts(group):
 	token = ACCESS_TOKEN
 	until = int(time())
 
-	since = until - (FREQUENCY * 60)
+	since = until - (FREQUENCY * 60 * 60)
 	payload = {'access_token': token, 'fields': 'message,id,created_time', 'since': since, 'until': until, 'time_format': 'U'}
 
 
@@ -51,6 +52,7 @@ def get_posts(group):
 	if r.status_code != 200:
 		return None
 	data = r.json()['data']
+
 	if not data:
 		del payload['since']
 		del payload['until']
@@ -79,30 +81,30 @@ def iso_to_seconds(ts):
 
 def input_filter(posts, phrase, maxprice=0):
 	filtered = []
-	if maxprice > 0:
+	if maxprice > Decimal(0):
 		for post in posts:
 			msg = post['message'].lower()
 			if 'free' in msg:
 				filtered.append(post)
 				pass;
 			prices = re.findall(ur'([$])(\d+(?:\.\d{2})?)', post['message'])
+			print msg 
+			print prices
 			for price in prices:
-				if int(price[1]) <= maxprice:
+				if Decimal(price[1]) <= maxprice:
 					filtered.append(post)
 					break;
-	if filtered is None:
+	if not filtered:
 		if maxprice > 0:
 			return None
 		else:
-			filtered = posts.copy()
-	for word in phrase:
-		filtered[:] = [x for x in filtered if word in x['message'].lower()]
+			filtered = list(posts)
+	filtered[:] = [x for x in filtered if phrase in x['message'].lower()]
 	return filtered
 
+# def main():
+	# groups = get_groups()
+	# sale_groups = process_groups(groups)
 
-def main():
-	groups = get_groups()
-	sale_groups = process_groups(groups)
-
-if __name__ == "__main__":
-	main()
+# if __name__ == "__main__":
+# 	main()
